@@ -27,8 +27,11 @@ while(img2.isOpened()):
     gray = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
     #BFMatcher dengan parameter default
-    matches = bf.match(des1,des2)
-
+    if (des2 is not None):
+        matches = bf.match(des1,des2)
+    else:
+        break
+    
     #mendapatkan matches yang telah disort
     matches = sorted(matches, key = lambda x:x.distance)
 
@@ -44,7 +47,7 @@ while(img2.isOpened()):
     pts = np.float32([ [0,0],[0,h-1],[w-1,h-1],[w-1,0] ]).reshape(-1,1,2)
 
     dst = cv2.perspectiveTransform(pts,M)
-    dst += (w, 0)  # adding offset
+    #dst += (w, 0)  # adding offset
 
     draw_params = dict(matchColor = (0,255,0), # draw matches in green color
                    singlePointColor = None,
@@ -59,12 +62,12 @@ while(img2.isOpened()):
 
     #pembatasan untuk membuat persegi dan trapezium untuk deteksi logo yang ditemukan
     if (((dst[0][0][1]) < (dst[2][0][1]) and (dst[1][0][1]) > (dst[3][0][1])) and ((dst[0][0][0]) < (dst[2][0][0]) and (dst[1][0][0]) < (dst[3][0][0]))) :
-        img3 = cv2.polylines(img3,[np.int32(dst)], True, (0,0,255),3, cv2.LINE_AA)
+        frame = cv2.polylines(frame2,[np.int32(dst)], True, (0,0,255),3, cv2.LINE_AA)
         i += 1
         
 
     #tampilan video
-    cv2.imshow('',img3)
+    cv2.imshow('',frame2)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
